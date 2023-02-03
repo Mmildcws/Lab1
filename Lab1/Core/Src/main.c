@@ -42,9 +42,12 @@
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-int state = 1;
+int b=0;
+int a =0;
+int ref[12];
 int position =0;
-
+static number[12];
+static Cnum =0;
 struct ButtonState
 {
 	GPIO_PinState Current;
@@ -84,8 +87,9 @@ uint16_t Last = 0;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
-/* USER CODE BEGIN PFP */
 
+/* USER CODE BEGIN PFP */
+void state();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -100,7 +104,18 @@ static void MX_USART2_UART_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+ref[0]=9;
+ref[1]=1;
+ref[2]=10;
+ref[3]=1;
+ref[4]=3;
+ref[5]=5;
+ref[6]=3;
+ref[7]=3;
+ref[8]=3;
+ref[9]=2;
+ref[10]=6;
+ref[11]=15;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -138,6 +153,7 @@ int main(void)
 	  	  {
 	  		  timestamp = HAL_GetTick()+10;
 	  		  ReadMatrixButton_1Row();
+
 	  	  }
   }
   /* USER CODE END 3 */
@@ -309,6 +325,8 @@ void ReadMatrixButton_1Row()
 
 			ButtonMatrix |= 1<<(x*4+i);
 			position = (x*4+i);
+			state();
+
 		}
 		else
 		{
@@ -328,74 +346,111 @@ void ReadMatrixButton_1Row()
 		x++;
 		x%=4;
 
-
-
-switch (state)
+}
+void state()
 {
-	case 1 :
-		//6
-		if(position == 9) state =2;
-		else state=1;
-	break;
-	case 2 :
-		//4
-		if(position == 1) state =3;
-		else if(position != 1) state=1;
-	break;
-	case 3 :
-		//3
-		if(position == 10) state =4;
-		else state=1;
-	break;
-	case 4 :
-		//4
-		if(position == 1) state =5;
-		else state=1;
-	break;
-	case 5 :
-		//0
-		if(position == 3) state =6;
-		else state=1;
-	break;
-	case 6 :
-		//5
-		if(position == 5) state =7;
-		else state=1;
-	break;
-	case 7 :
-		//0
-		if(position == 3) state =8;
-		else state=1;
-	break;
-	case 8 :
-		//0
-		if(position == 3) state =9;
-		else state=1;
-	break;
-	case 9 :
-		//0
-		if(position == 3) state =10;
-		else state=1;
-	break;
-	case 10 :
-		//1
-		if(position == 2) state =11;
-		else state=1;
-	break;
-	case 11 :
-		//2
-		if(position == 6) state =12;
-		else state=1;
-	break;
-	case 12 :
-		//OK
-		if(position == 15){
-			state =1;
-			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
+//	static number[12];
+//	static Cnum =0;
+
+	register int i;
+
+		number[Cnum]=position;
+
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
+
+		if(number[Cnum]==ref[Cnum] ){
+			a++;
+
 		}
-		else state =1;
+		if(a==12){
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
+			for(i=0;i<12;i++){
+				number[i]=0;
+				Cnum=0;
+				a=0;
+			}
+
+		}
+		else if(number[Cnum]==12 ){
+			for(i=0;i<12;i++){
+				number[i]=0;
+				Cnum=0;
+				a=0;
+			}
+
+		}
+		Cnum++;
+		Cnum%12;
+
+
+
 }
-}
+//switch (state)
+//{
+//	case 1 :
+//		//6
+//		if(position == 9) state =2;
+//		else state=1;
+//	break;
+//	case 2 :
+//		//4
+//		if(position == 1) state =3;
+//		else if(position != 1) state=1;
+//	break;
+//	case 3 :
+//		//3
+//		if(position == 10) state =4;
+//		else state=1;
+//	break;
+//	case 4 :
+//		//4
+//		if(position == 1) state =5;
+//		else state=1;
+//	break;
+//	case 5 :
+//		//0
+//		if(position == 3) state =6;
+//		else state=1;
+//	break;
+//	case 6 :
+//		//5
+//		if(position == 5) state =7;
+//		else state=1;
+//	break;
+//	case 7 :
+//		//0
+//		if(position == 3) state =8;
+//		else state=1;
+//	break;
+//	case 8 :
+//		//0
+//		if(position == 3) state =9;
+//		else state=1;
+//	break;
+//	case 9 :
+//		//0
+//		if(position == 3) state =10;
+//		else state=1;
+//	break;
+//	case 10 :
+//		//1
+//		if(position == 2) state =11;
+//		else state=1;
+//	break;
+//	case 11 :
+//		//2
+//		if(position == 6) state =12;
+//		else state=1;
+//	break;
+//	case 12 :
+//		//OK
+//		if(position == 15){
+//			state =1;
+//			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
+//		}
+//		else state =1;
+//}
+
 
 /* USER CODE END 4 */
 
